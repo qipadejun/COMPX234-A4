@@ -69,3 +69,25 @@ class UDPServer:
 
         except Exception as e:
             print(f"Error in file transfer: {e}")
+
+    def run(self):
+        # Master server loop.
+        while True:
+            try:
+                # Receive download request.
+                data, addr = self.main_socket.recvfrom(1024)
+                request = data.decode().strip()
+
+                if request.startswith("DOWNLOAD"):
+                    # Resolve file name.
+                    filename = request.split()[1]
+
+                    # Create a new thread to handle file transfers.
+                    threading.Thread(
+                        target=self.handle_file_transfer,
+                        args=(filename, addr),
+                        daemon=True
+                    ).start()
+
+            except Exception as e:
+                print(f"Server error: {e}")
